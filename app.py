@@ -28,7 +28,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from flask import Flask, Response, jsonify, render_template, request
 
 # ---------------------------------------------------------------------------
-# checkers.py — provided separately (see checkers.example.py for the contract)
+# checkers.py — provided separately by the user; only imported, never replaced
 # ---------------------------------------------------------------------------
 try:
     from checkers import DisneyChecker  # noqa: F401
@@ -56,6 +56,8 @@ log = logging.getLogger("subcheck")
 CHECK_TIMEOUT = int(os.environ.get("CHECK_TIMEOUT", "90"))
 # Heartbeat interval (seconds) for SSE keep-alive pings.
 PING_INTERVAL = 15
+# Process start time, used by the /health liveness endpoint.
+START_TIME = time.monotonic()
 
 SERVICE_ALIASES: Dict[str, str] = {
     "expressvpn": "expressvpn",
@@ -349,7 +351,19 @@ def index() -> str:
 
 @app.route("/health")
 def health() -> Response:
-    return jsonify({"ok": True, "checkers_available": CHECKERS_AVAILABLE})
+    """
+    Lightweight liveness endpoint for external monitors (Uptime Robot).
+
+    Always returns HTTP 200 while the process is alive, regardless of whether
+    checkers.py is present, so uptime monitoring stays green.
+    """
+    return jsonify({
+        "status": "ok",
+        "ok": True,
+        "app": "subverify",
+        "checkers_available": CHECKERS_AVAILABLE,
+        "uptime_seconds": round(time.monotonic() - START_TIME, 1),
+    }), 200
 
 
 @app.post("/check")
