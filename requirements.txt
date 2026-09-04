@@ -1,8 +1,13 @@
-Flask>=3.0,<4
+# proxy.py needs NOTHING — plain `python proxy.py` works on a bare Python 3.8+.
+# Everything below is optional.
+
+# Optional engine: nicer HTTP handling. Install requests + pysocks together if
+# you want SOCKS4/SOCKS5 validation through requests (proxy.py otherwise uses
+# its own built-in socks client).
 requests>=2.31,<3
-gunicorn>=21.2
 pysocks>=1.7
 urllib3>=2.0
-# for exe build (optional on server, required for desktop)
-pyinstaller>=6.0
-Pillow>=9.0
+
+# Optional: only for the web dashboard (app.py)
+Flask>=3.0,<4
+gunicorn>=21.2
