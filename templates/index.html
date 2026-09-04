@@ -1,0 +1,973 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ultimate Proxy Scrapper & Validator — Free Proxy Harvester</title>
+  <meta name="description" content="Scrape 18+ free proxy sources, validate at 80 threads, export elite proxies in one click.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #060a14;
+      --bg-soft: #0a1120;
+      --panel: #0e1629;
+      --panel-2: #111d33;
+      --panel-3: #16213a;
+      --border: rgba(148,163,184,.12);
+      --border-strong: rgba(148,163,184,.22);
+      --text: #e6edf6;
+      --text-dim: #8b9bb4;
+      --text-faint: #5a6b87;
+      --accent: #6366f1;
+      --accent-2: #8b5cf6;
+      --accent-3: #06b6d4;
+      --accent-4: #f43f5e;
+      --ok: #10b981;
+      --bad: #ef4444;
+      --warn: #f59e0b;
+      --info: #0ea5e9;
+      --radius: 16px;
+      --radius-sm: 12px;
+    }
+    * { scrollbar-width: thin; scrollbar-color: #243041 transparent; }
+    *::-webkit-scrollbar { width: 6px; height: 6px; }
+    *::-webkit-scrollbar-thumb { background: #243041; border-radius: 999px; }
+    *::-webkit-scrollbar-track { background: transparent; }
+    html, body { background: var(--bg); color: var(--text); font-family: "Inter", system-ui, -apple-system, sans-serif; }
+    body { min-height: 100vh; position: relative; overflow-x: hidden; }
+    .bg-glow {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background:
+        radial-gradient(900px 600px at 18% -8%, rgba(99,102,241,.18), transparent 60%),
+        radial-gradient(700px 500px at 92% 0%, rgba(139,92,246,.16), transparent 55%),
+        radial-gradient(800px 600px at 50% 120%, rgba(6,182,214,.08), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.015), transparent 40%);
+    }
+    /* header */
+    .app-header { padding: 1.35rem 0 .9rem; }
+    .brand-mark {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2) 55%, var(--accent-3));
+      color: white; font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.1rem;
+      box-shadow: 0 8px 24px rgba(99,102,241,.35), inset 0 1px 0 rgba(255,255,255,.2);
+      flex: none;
+    }
+    .app-title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.55rem; letter-spacing: -.02em; line-height: 1; margin: 0; }
+    .app-title span { background: linear-gradient(90deg, #818cf8, #c4b5fd, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .app-subtitle { color: var(--text-dim); font-size: .88rem; margin: .22rem 0 0; }
+    .pill {
+      display: inline-flex; align-items: center; gap: .45rem;
+      font-size: .72rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+      padding: .38rem .75rem; border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--text-dim);
+    }
+    .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 8px rgba(16,185,129,.6); }
+    .pill.live { color: #a5b4fc; border-color: rgba(99,102,241,.3); background: rgba(99,102,241,.1); }
+    .pill.live .dot { background: #818cf8; animation: pulse 1.4s ease infinite; }
+    @keyframes pulse { 0%,100%{ opacity:1; transform: scale(1)} 50%{opacity:.5; transform: scale(.85)} }
+    /* cards */
+    .card.panel { background: linear-gradient(180deg, var(--panel), var(--panel-2)); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 12px 40px rgba(2,6,20,.45), 0 1px 0 rgba(255,255,255,.03) inset; }
+    .card.panel .card-header { background: transparent; border-bottom: 1px solid var(--border); padding: .85rem 1.1rem; }
+    .card-title-sm { font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); margin: 0; display: flex; align-items: center; gap: .5rem; }
+    .card-title-sm i { color: var(--accent-2); }
+    /* stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: .75rem; }
+    @media (max-width: 768px){ .stats-grid{ grid-template-columns: repeat(2,1fr);} }
+    .stat-card { background: rgba(255,255,255,.025); border: 1px solid var(--border); border-radius: 12px; padding: .9rem 1rem; position: relative; overflow: hidden; }
+    .stat-card::after { content:""; position:absolute; inset:0; background: radial-gradient(300px 120px at 90% 0%, rgba(99,102,241,.08), transparent); pointer-events:none; }
+    .stat-label { font-size: .68rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); }
+    .stat-value { font-family: "Space Grotesk", sans-serif; font-size: 1.65rem; font-weight: 700; line-height: 1; margin: .3rem 0 .15rem; }
+    .stat-value small { font-size: .85rem; font-weight: 500; color: var(--text-dim); }
+    .stat-sub { font-size: .75rem; color: var(--text-dim); }
+    .stat-card.valid .stat-value{ color: var(--ok); }
+    .stat-card.speed .stat-value{ color: var(--accent-3); }
+    .stat-card.total .stat-value{ color: var(--text); }
+    .stat-card.sources .stat-value{ color: #a5b4fc; }
+    /* controls */
+    .section-label { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-faint); margin-bottom: .45rem; }
+    .sources-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: .5rem; max-height: 280px; overflow-y: auto; padding-right: 4px; }
+    @media (max-width: 992px){ .sources-grid{ grid-template-columns: repeat(2,1fr);} }
+    @media (max-width: 576px){ .sources-grid{ grid-template-columns: 1fr;} }
+    .source-check {
+      display: flex; align-items: center; gap: .6rem;
+      padding: .55rem .7rem; border-radius: 10px; border: 1px solid var(--border);
+      background: rgba(255,255,255,.02); cursor: pointer; transition: all .15s ease; user-select: none;
+    }
+    .source-check:hover { background: rgba(99,102,241,.07); border-color: rgba(99,102,241,.25); }
+    .source-check.checked { background: rgba(99,102,241,.12); border-color: rgba(99,102,241,.35); box-shadow: 0 0 0 3px rgba(99,102,241,.08); }
+    .source-check input { accent-color: var(--accent); }
+    .source-name { font-size: .82rem; font-weight: 600; line-height: 1.1; }
+    .source-meta { font-size: .70rem; color: var(--text-faint); }
+    .protocol-pills { display: flex; flex-wrap: wrap; gap: .45rem; }
+    .proto-pill {
+      display: inline-flex; align-items: center; gap: .35rem;
+      padding: .42rem .75rem; border-radius: 999px; border: 1px solid var(--border);
+      background: rgba(255,255,255,.03); font-size: .8rem; font-weight: 600; cursor: pointer; transition: all .15s;
+    }
+    .proto-pill.active { background: var(--accent); border-color: var(--accent); color: white; box-shadow: 0 4px 14px rgba(99,102,241,.35); }
+    .proto-pill.socks.active { background: #0ea5e9; border-color: #0ea5e9; }
+    .form-control, .form-select {
+      background: rgba(2,8,20,.55); border: 1px solid var(--border); color: var(--text); border-radius: 10px; font-size: .88rem;
+    }
+    .form-control::placeholder { color: #4a5a75; }
+    .form-control:focus, .form-select:focus { background: rgba(2,8,20,.75); border-color: rgba(99,102,241,.45); box-shadow: 0 0 0 3px rgba(99,102,241,.15); color: var(--text); }
+    .form-control.mono { font-family: "JetBrains Mono", monospace; font-size: .82rem; }
+    .btn-primary {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2)); border: none; font-weight: 600; letter-spacing: -.01em;
+      box-shadow: 0 6px 20px rgba(99,102,241,.35); transition: all .15s;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(99,102,241,.45); filter: brightness(1.05); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-ghost { background: rgba(255,255,255,.06); border: 1px solid var(--border); color: var(--text); font-weight: 600; }
+    .btn-ghost:hover { background: rgba(255,255,255,.09); border-color: var(--border-strong); color: white; }
+    .btn-success { background: var(--ok); border: none; font-weight: 600; color: #022c22; }
+    .btn-success:hover { background: #0ec58f; color: #022c22; }
+    /* progress */
+    .progress { height: 10px; background: rgba(2,8,20,.8); border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+    .progress-bar { background: linear-gradient(90deg, var(--accent), var(--accent-2) 55%, var(--accent-3)); border-radius: 999px; box-shadow: 0 0 14px rgba(99,102,241,.6); transition: width .35s ease; }
+    .progress-label { font-family: "JetBrains Mono", monospace; font-size: .78rem; color: var(--text-dim); }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: .4rem; font-size: .76rem; font-weight: 700; letter-spacing: .03em;
+      padding: .32rem .75rem; border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--text-dim);
+    }
+    .status-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #475569; }
+    .status-badge.running { color: #a5b4fc; border-color: rgba(99,102,241,.35); background: rgba(99,102,241,.1); }
+    .status-badge.running .dot { background: #818cf8; animation: pulse 1.2s infinite; }
+    .status-badge.done { color: #6ee7b7; border-color: rgba(16,185,129,.3); background: rgba(16,185,129,.08); }
+    .status-badge.done .dot { background: var(--ok); }
+    .status-badge.error { color: #fca5a5; border-color: rgba(239,68,68,.3); background: rgba(239,68,68,.08); }
+    .status-badge.idle .dot { background: #334155; }
+    /* log */
+    .log-shell { background: #02060e; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .log-head { display:flex; align-items:center; justify-content: space-between; padding: .55rem .8rem; border-bottom: 1px solid var(--border); background: rgba(255,255,255,.015); }
+    .log-head-title { font-size: .70rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--text-dim); display:flex; align-items:center; gap:.45rem; }
+    .log-body { height: 260px; overflow-y: auto; padding: .5rem .6rem; font-family: "JetBrains Mono", monospace; font-size: .76rem; }
+    .log-line { display:flex; gap:.55rem; padding:.22rem .3rem; border-radius:6px; line-height:1.5; }
+    .log-line:hover{ background: rgba(148,163,184,.05); }
+    .log-time{ color:#3a4a64; flex:none; }
+    .log-tag{ flex:none; min-width: 64px; text-align:center; border-radius:5px; font-size:.66rem; font-weight:700; padding:.1rem .35rem; height: fit-content;}
+    .log-tag.valid{ color:#6ee7b7; background: rgba(16,185,129,.12); }
+    .log-tag.dead{ color:#fca5a5; background: rgba(239,68,68,.12); }
+    .log-tag.timeout{ color:#fdba74; background: rgba(245,158,11,.12); }
+    .log-tag.info, .log-tag.scrape{ color:#93c5fd; background: rgba(14,165,233,.12); }
+    .log-tag.done{ color:#c4b5fd; background: rgba(139,92,246,.14); }
+    .log-tag.error{ color:#fca5a5; background: rgba(239,68,68,.12); }
+    .log-msg{ color:#cbd5e1; word-break: break-word; }
+    .log-empty{ color:#334155; font-style: italic; padding: .8rem; }
+    /* table */
+    .proxy-table-wrap { background: rgba(255,255,255,.015); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .table { --bs-table-bg: transparent; --bs-table-color: var(--text); margin:0; font-size: .84rem; }
+    .table thead th { font-size:.70rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--text-faint); border-bottom: 1px solid var(--border); background: rgba(255,255,255,.02); padding:.7rem .8rem; white-space: nowrap; }
+    .table tbody td { padding:.6rem .8rem; border-bottom: 1px solid rgba(148,163,184,.06); vertical-align: middle; }
+    .table tbody tr:hover { background: rgba(99,102,241,.05); }
+    .badge-proto { font-size:.68rem; font-weight:700; letter-spacing:.04em; padding:.2rem .5rem; border-radius: 6px; }
+    .badge-proto.http{ background: rgba(99,102,241,.15); color:#a5b4fc; border:1px solid rgba(99,102,241,.25); }
+    .badge-proto.https{ background: rgba(16,185,129,.12); color:#6ee7b7; border:1px solid rgba(16,185,129,.22); }
+    .badge-proto.socks4{ background: rgba(14,165,233,.12); color:#7dd3fc; border:1px solid rgba(14,165,233,.22); }
+    .badge-proto.socks5{ background: rgba(245,158,11,.12); color:#fcd34d; border:1px solid rgba(245,158,11,.22); }
+    .latency { font-family:"JetBrains Mono", monospace; font-weight:600; }
+    .latency.fast{ color: var(--ok); }
+    .latency.medium{ color: #fbbf24; }
+    .latency.slow{ color: #f87171; }
+    .status-dot{ width:8px; height:8px; border-radius:50%; display:inline-block; }
+    .status-dot.valid{ background: var(--ok); box-shadow: 0 0 8px rgba(16,185,129,.5); }
+    .status-dot.dead{ background: var(--bad); }
+    .status-dot.timeout{ background: var(--warn); }
+    .status-dot.unvalidated{ background: #475569; }
+    /* filters */
+    .filter-bar { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; }
+    .filter-chip {
+      display:inline-flex; align-items:center; gap:.35rem; padding:.3rem .65rem; border-radius:999px;
+      border:1px solid var(--border); background: rgba(255,255,255,.04); font-size:.78rem; font-weight:600; color: var(--text-dim); cursor:pointer;
+    }
+    .filter-chip.active { background: var(--accent); border-color: var(--accent); color:white; }
+    /* hero */
+    .hero-card {
+      background: linear-gradient(135deg, rgba(99,102,241,.14), rgba(139,92,246,.10) 45%, rgba(6,182,214,.07));
+      border: 1px solid rgba(99,102,241,.18); border-radius: var(--radius); padding: 1.2rem 1.3rem; position: relative; overflow: hidden;
+    }
+    .hero-card::after { content:""; position:absolute; width: 420px; height: 220px; right:-60px; top:-80px; background: radial-gradient(300px 160px at 50% 50%, rgba(139,92,246,.18), transparent 70%); pointer-events:none; }
+    .hero-title { font-family:"Space Grotesk", sans-serif; font-weight:700; font-size:1.15rem; letter-spacing:-.02em; margin:0; }
+    .hero-text { color: var(--text-dim); font-size:.86rem; margin:.35rem 0 0; line-height:1.5; }
+    .kpi-row { display:flex; gap:1.2rem; margin-top:.9rem; flex-wrap: wrap; }
+    .kpi { flex:1; min-width: 90px; }
+    .kpi b { font-family:"JetBrains Mono", monospace; font-size:1.25rem; line-height:1; }
+    .kpi span { display:block; font-size:.68rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--text-faint); margin-top:.2rem; }
+    /* textarea */
+    .mono-area { font-family:"JetBrains Mono", monospace; font-size:.82rem; line-height:1.6; }
+    /* footer */
+    footer { padding: 2rem 0 1.5rem; color: #4a5a75; font-size:.8rem; text-align:center; }
+    /* toast */
+    .toast-proxy { position: fixed; bottom: 18px; right: 18px; z-index: 1080; background: #0f172a; border:1px solid var(--border-strong); color: var(--text); padding:.8rem 1rem; border-radius:12px; box-shadow: 0 16px 40px rgba(0,0,0,.5); display:none; max-width: 360px; font-size:.85rem; }
+    .toast-proxy.show{ display:block; animation: slideIn .25s ease; }
+    @keyframes slideIn{ from{ transform: translateY(10px); opacity:0} to{ transform: translateY(0); opacity:1} }
+    @media (max-width: 575px){ .app-title{ font-size:1.25rem;} .hero-card{ padding:1rem;} }
+  </style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+
+  <header class="container app-header">
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+      <div class="brand-mark"><i class="bi bi-shield-check"></i></div>
+      <div class="me-auto">
+        <h1 class="app-title">Ultimate <span>Proxy Scrapper</span></h1>
+        <p class="app-subtitle">Harvest • Validate • Export — 18 sources, 80-thread validator, elite detection</p>
+      </div>
+      <span class="pill live"><span class="dot"></span> Live & Free</span>
+      <a href="https://github.com/harshi79/Ultimate-Free-Proxy-Scrapper-And-Validator" target="_blank" class="pill text-decoration-none"><i class="bi bi-github"></i> GitHub</a>
+    </div>
+  </header>
+
+  <main class="container pb-4">
+    <!-- Hero + Stats -->
+    <div class="row g-3 mb-3">
+      <div class="col-lg-5">
+        <div class="hero-card h-100">
+          <h2 class="hero-title">Stop paying for proxies. Scrape them.</h2>
+          <p class="hero-text">One click scrapes <b style="color: var(--text)">15+ public proxy lists</b> & GitHub mirrors, validates each proxy against <code>httpbin</code> with latency profiling, and lets you export elite <b style="color:#6ee7b7">valid</b> proxies instantly.</p>
+          <div class="kpi-row">
+            <div class="kpi"><b id="kpiSources">18</b><span>Sources</span></div>
+            <div class="kpi"><b id="kpiProtocols">4</b><span>Protocols</span></div>
+            <div class="kpi"><b id="kpiThreads">80</b><span>Threads</span></div>
+            <div class="kpi"><b id="kpiAvg">~1.2s</b><span>Avg. check</span></div>
+          </div>
+          <div class="d-flex gap-2 mt-3">
+            <span class="badge rounded-pill" style="background: rgba(16,185,129,.15); color:#6ee7b7; border:1px solid rgba(16,185,129,.25)"><i class="bi bi-lightning-charge"></i> No API key</span>
+            <span class="badge rounded-pill" style="background: rgba(99,102,241,.12); color:#a5b4fc; border:1px solid rgba(99,102,241,.25)">Open Source</span>
+            <span class="badge rounded-pill" style="background: rgba(14,165,233,.12); color:#7dd3fc; border:1px solid rgba(14,165,233,.22)">TXT / JSON / CSV</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="stats-grid">
+          <div class="stat-card total">
+            <div class="stat-label"><i class="bi bi-collection"></i> Total Scraped</div>
+            <div class="stat-value" id="statTotal">0</div>
+            <div class="stat-sub" id="statTotalSub">in memory</div>
+          </div>
+          <div class="stat-card valid">
+            <div class="stat-label"><i class="bi bi-check-circle"></i> Valid</div>
+            <div class="stat-value" id="statValid">0</div>
+            <div class="stat-sub" id="statValidSub">0% success</div>
+          </div>
+          <div class="stat-card speed">
+            <div class="stat-label"><i class="bi bi-speedometer2"></i> Avg Latency</div>
+            <div class="stat-value" id="statLatency">—<small> ms</small></div>
+            <div class="stat-sub" id="statLatencySub">fast &lt; 800ms</div>
+          </div>
+          <div class="stat-card sources">
+            <div class="stat-label"><i class="bi bi-globe2"></i> Live Sources</div>
+            <div class="stat-value" id="statSources">18</div>
+            <div class="stat-sub">auto-updated</div>
+          </div>
+        </div>
+        <div class="card panel mt-3">
+          <div class="card-body p-3">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+              <div class="d-flex align-items-center gap-2">
+                <span id="scrapeBadge" class="status-badge idle"><span class="dot"></span> Idle</span>
+                <span id="validateBadge" class="status-badge idle"><span class="dot"></span> Validator idle</span>
+                <span class="progress-label" id="globalTimer">00:00</span>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-ghost" id="btnCopyAll"><i class="bi bi-clipboard"></i> Copy valid</button>
+                <div class="btn-group btn-group-sm">
+                  <a class="btn btn-ghost" href="/export/txt?status=valid" id="exportTxt"><i class="bi bi-download"></i> TXT</a>
+                  <a class="btn btn-ghost" href="/export/json?status=valid" id="exportJson">JSON</a>
+                  <a class="btn btn-ghost" href="/export/csv?status=valid" id="exportCsv">CSV</a>
+                </div>
+              </div>
+            </div>
+            <div class="progress mt-3" role="progressbar"><div id="globalProgress" class="progress-bar" style="width: 0%"></div></div>
+            <div class="d-flex justify-content-between mt-1">
+              <span class="progress-label" id="progressText">Ready to scrape</span>
+              <span class="progress-label" id="progressCount">0 / 0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <!-- Left: Controls -->
+      <div class="col-lg-5">
+        <!-- Scrape Card -->
+        <div class="card panel mb-3">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <h2 class="card-title-sm"><i class="bi bi-cloud-download"></i> 1 — Scrape</h2>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-ghost py-1 px-2" id="btnSelectAll" style="font-size:.75rem">Select all</button>
+              <button class="btn btn-sm btn-ghost py-1 px-2" id="btnDeselectAll" style="font-size:.75rem">None</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="section-label">Proxy sources (click to toggle)</div>
+            <div id="sourcesGrid" class="sources-grid mb-3">
+              <!-- injected by JS -->
+              <div class="text-center py-4 w-100" style="grid-column: 1/-1; color: var(--text-dim)">Loading sources…</div>
+            </div>
+
+            <div class="section-label">Protocols</div>
+            <div class="protocol-pills mb-3" id="protocolPills">
+              <span class="proto-pill active" data-proto="http"><i class="bi bi-globe"></i> HTTP</span>
+              <span class="proto-pill active" data-proto="https"><i class="bi bi-shield-lock"></i> HTTPS</span>
+              <span class="proto-pill socks" data-proto="socks4"><i class="bi bi-hdd-network"></i> SOCKS4</span>
+              <span class="proto-pill socks" data-proto="socks5"><i class="bi bi-hdd-stack"></i> SOCKS5</span>
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="section-label">Limit</label>
+                <select id="scrapeLimit" class="form-select form-select-sm">
+                  <option value="0">No limit</option>
+                  <option value="100">100</option>
+                  <option value="500" selected>500</option>
+                  <option value="1000">1,000</option>
+                  <option value="2000">2,000</option>
+                  <option value="5000">5,000</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="section-label">Action</label>
+                <div class="d-grid">
+                  <button id="btnScrape" class="btn btn-primary"><i class="bi bi-rocket-takeoff"></i> Scrape proxies</button>
+                </div>
+              </div>
+            </div>
+            <button id="btnStopScrape" class="btn btn-ghost w-100 d-none"><i class="bi bi-stop-circle"></i> Stop scraping</button>
+            <div class="d-flex align-items-center gap-2 mt-3">
+              <div class="progress flex-grow-1" style="height:6px"><div id="scrapeProgress" class="progress-bar" style="width:0%"></div></div>
+              <span class="progress-label" id="scrapeProgressText">0 / 0</span>
+            </div>
+            <div class="progress-label mt-1" id="scrapeFound">No scrape yet — pick sources and hit Scrape</div>
+          </div>
+        </div>
+
+        <!-- Validate Card -->
+        <div class="card panel mb-3">
+          <div class="card-header">
+            <h2 class="card-title-sm"><i class="bi bi-check2-square"></i> 2 — Validate</h2>
+          </div>
+          <div class="card-body">
+            <div class="d-flex gap-2 mb-2">
+              <button class="btn btn-sm btn-ghost flex-fill" id="btnUseScraped"><i class="bi bi-collection"></i> Use scraped proxies</button>
+              <button class="btn btn-sm btn-ghost" id="btnClearValidate"><i class="bi bi-trash"></i></button>
+            </div>
+            <label class="section-label">Proxies to validate (ip:port per line)</label>
+            <textarea id="validateInput" class="form-control mono mono-area" rows="5" placeholder="1.2.3.4:8080&#10;5.6.7.8:3128&#10;# paste your list here or click 'Use scraped proxies'"></textarea>
+            <div class="row g-2 mt-2">
+              <div class="col-4">
+                <label class="section-label">Timeout</label>
+                <select id="validateTimeout" class="form-select form-select-sm">
+                  <option value="3">3s</option>
+                  <option value="5">5s</option>
+                  <option value="8" selected>8s</option>
+                  <option value="12">12s</option>
+                </select>
+              </div>
+              <div class="col-4">
+                <label class="section-label">Protocol</label>
+                <select id="validateProto" class="form-select form-select-sm">
+                  <option value="http" selected>http</option>
+                  <option value="https">https</option>
+                  <option value="socks4">socks4</option>
+                  <option value="socks5">socks5</option>
+                </select>
+              </div>
+              <div class="col-4">
+                <label class="section-label">Test URL</label>
+                <input id="validateUrl" class="form-control form-control-sm" value="http://httpbin.org/ip">
+              </div>
+            </div>
+            <div class="d-grid mt-3 gap-2">
+              <button id="btnValidate" class="btn btn-success"><i class="bi bi-shield-check"></i> Validate proxies</button>
+              <button id="btnStopValidate" class="btn btn-ghost d-none"><i class="bi bi-stop-circle"></i> Stop validation</button>
+            </div>
+            <div class="d-flex align-items-center gap-2 mt-3">
+              <div class="progress flex-grow-1" style="height:6px"><div id="validateProgress" class="progress-bar" style="width:0%; background: linear-gradient(90deg, #10b981, #06b6d4)"></div></div>
+              <span class="progress-label" id="validateProgressText">0 / 0</span>
+            </div>
+            <div class="d-flex gap-2 mt-1 flex-wrap" style="font-size:.75rem; color: var(--text-dim)">
+              <span><span class="status-dot valid"></span> Valid: <b id="cntValid">0</b></span>
+              <span><span class="status-dot dead"></span> Dead: <b id="cntDead">0</b></span>
+              <span><span class="status-dot timeout"></span> Timeout: <b id="cntTimeout">0</b></span>
+              <span>Speed: <b id="cntSpeed">—</b></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Log -->
+        <div class="log-shell">
+          <div class="log-head">
+            <span class="log-head-title"><i class="bi bi-terminal"></i> Live log</span>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-ghost py-0 px-2" id="btnClearLog" style="font-size:.7rem"><i class="bi bi-x-lg"></i> Clear</button>
+              <span class="pill" style="font-size:.65rem; padding:.2rem .5rem" id="logCount">0 lines</span>
+            </div>
+          </div>
+          <div id="logBody" class="log-body"><div class="log-empty">Logs appear here while scraping / validating…</div></div>
+        </div>
+      </div>
+
+      <!-- Right: Proxy Table -->
+      <div class="col-lg-7">
+        <div class="card panel">
+          <div class="card-header">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+              <h2 class="card-title-sm"><i class="bi bi-hdd-stack"></i> Proxy pool <span class="badge bg-secondary ms-1" id="poolCount" style="font-size:.65rem">0</span></h2>
+              <div class="filter-bar">
+                <span class="filter-chip active" data-filter="all">All</span>
+                <span class="filter-chip" data-filter="valid"><span class="status-dot valid"></span> Valid</span>
+                <span class="filter-chip" data-filter="unvalidated"><span class="status-dot unvalidated"></span> New</span>
+                <span class="filter-chip" data-filter="dead">Dead</span>
+                <span class="filter-chip" data-filter="timeout">Timeout</span>
+              </div>
+            </div>
+            <div class="d-flex gap-2 mt-3 flex-wrap">
+              <div class="position-relative flex-grow-1" style="min-width: 180px;">
+                <i class="bi bi-search position-absolute" style="left:10px; top:50%; transform: translateY(-50%); color: var(--text-faint)"></i>
+                <input id="searchInput" class="form-control form-control-sm ps-4" placeholder="Search ip, port, proxy…" style="padding-left: 2rem !important;">
+              </div>
+              <select id="protoFilter" class="form-select form-select-sm" style="width: 130px;">
+                <option value="">All protocols</option>
+                <option value="http">HTTP</option>
+                <option value="https">HTTPS</option>
+                <option value="socks4">SOCKS4</option>
+                <option value="socks5">SOCKS5</option>
+              </select>
+              <button class="btn btn-sm btn-ghost" id="btnRefresh"><i class="bi bi-arrow-clockwise"></i></button>
+              <button class="btn btn-sm btn-ghost text-danger" id="btnClearPool"><i class="bi bi-trash3"></i> Clear</button>
+            </div>
+          </div>
+          <div class="proxy-table-wrap">
+            <div style="max-height: 620px; overflow-y: auto;" id="tableScroll">
+              <table class="table table-hover align-middle">
+                <thead style="position: sticky; top:0; z-index:1;">
+                  <tr>
+                    <th style="width: 36px;"><input type="checkbox" id="checkAll"></th>
+                    <th>Proxy</th>
+                    <th>Proto</th>
+                    <th>Status</th>
+                    <th>Latency</th>
+                    <th>Checked</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="proxyTbody">
+                  <tr><td colspan="7" class="text-center py-5" style="color: var(--text-dim)"><i class="bi bi-inbox" style="font-size:1.6rem; display:block; margin-bottom:.5rem"></i> No proxies yet.<br><span style="font-size:.8rem">Scrape to fill the pool, then Validate to find elite proxies.</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="d-flex align-items-center justify-content-between p-2 border-top" style="border-color: var(--border) !important; background: rgba(255,255,255,.015)">
+              <span class="progress-label" id="tableInfo">0 proxies</span>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-ghost" id="btnCopySelected"><i class="bi bi-clipboard-check"></i> Copy selected</button>
+                <button class="btn btn-sm btn-primary" id="btnValidateSelected"><i class="bi bi-shield-check"></i> Validate selected</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body p-3">
+            <div class="d-flex flex-wrap gap-2">
+              <span class="section-label mb-0 w-100">Quick export — valid only</span>
+              <button class="btn btn-sm btn-ghost" onclick="copyValid()"><i class="bi bi-clipboard"></i> Copy valid to clipboard</button>
+              <a class="btn btn-sm btn-ghost" href="/export/txt?status=valid"><i class="bi bi-filetype-txt"></i> Download TXT</a>
+              <a class="btn btn-sm btn-ghost" href="/export/json?status=valid"><i class="bi bi-filetype-json"></i> JSON</a>
+              <a class="btn btn-sm btn-ghost" href="/export/csv?status=valid"><i class="bi bi-filetype-csv"></i> CSV</a>
+              <span class="ms-auto progress-label">Tip: click a proxy to copy it • <a href="#" id="linkAllTxt" style="color: var(--text-dim)">download all TXT</a></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card panel mt-3">
+          <div class="card-body p-3">
+            <h3 class="card-title-sm mb-2"><i class="bi bi-info-circle"></i> How it works</h3>
+            <div class="row g-3" style="font-size:.84rem; color: var(--text-dim); line-height:1.6">
+              <div class="col-md-4"><b style="color: var(--text)"><i class="bi bi-1-circle"></i> Scrape</b><br>Fetches 18 public lists in parallel (ProxyScrape, GitHub mirrors, Geonode, JetKai…). Deduplicates and shuffles. No API key.</div>
+              <div class="col-md-4"><b style="color: var(--text)"><i class="bi bi-2-circle"></i> Validate</b><br>80 concurrent workers hit <code>httpbin.org/ip</code> through each proxy, measure latency, mark <span style="color: var(--ok)">valid</span> / dead / timeout.</div>
+              <div class="col-md-4"><b style="color: var(--text)"><i class="bi bi-3-circle"></i> Export</b><br>Copy valid proxies or download as TXT/JSON/CSV for your bot, scraper, or browser. Proxies stay in-memory until you clear.</div>
+            </div>
+            <div class="mt-3 p-2 rounded-3" style="background: rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.2); font-size:.78rem; color:#fcd34d"><i class="bi bi-exclamation-triangle"></i> Free proxies are volatile — expect 5–15% valid at any time. Re-scrape hourly. For anonymity, validate via <code>https://api.ipify.org?format=json</code> and check returned IP.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="container">
+    <div>Built for the open web • <span id="healthStatus" style="color: var(--text-dim)">checking health…</span> • <span id="uptime"></span></div>
+  </footer>
+
+  <div id="toast" class="toast-proxy"></div>
+
+  <script>
+    // --- state ---
+    let sources = [];
+    let selectedSources = new Set();
+    let selectedProtos = new Set(['http','https']);
+    let proxies = []; // from /api/proxies
+    let filterStatus = 'all';
+    let protoFilter = '';
+    let searchQuery = '';
+    let scrapeJobId = null;
+    let validateJobId = null;
+    let scrapeES = null;
+    let validateES = null;
+    let timerInterval = null;
+    let startTime = null;
+    let logLines = 0;
+
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => document.querySelectorAll(s);
+
+    function toast(msg, type='info'){
+      const el = $('#toast');
+      el.textContent = msg;
+      el.className = 'toast-proxy show';
+      el.style.borderColor = type==='success' ? 'rgba(16,185,129,.35)' : type==='error' ? 'rgba(239,68,68,.35)' : 'var(--border-strong)';
+      setTimeout(()=> el.classList.remove('show'), 3200);
+    }
+    function fmtTime(sec){
+      const m = String(Math.floor(sec/60)).padStart(2,'0');
+      const s = String(sec%60).padStart(2,'0');
+      return `${m}:${s}`;
+    }
+    function log(tag, msg){
+      const body = $('#logBody');
+      if(body.querySelector('.log-empty')) body.innerHTML='';
+      const t = new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+      const div = document.createElement('div');
+      div.className = 'log-line';
+      const cls = tag.toLowerCase();
+      div.innerHTML = `<span class="log-time">${t}</span><span class="log-tag ${cls}">${tag}</span><span class="log-msg">${msg}</span>`;
+      body.appendChild(div);
+      body.scrollTop = body.scrollHeight;
+      logLines++; $('#logCount').textContent = logLines + ' lines';
+    }
+    function setBadge(el, state, text){
+      el.className = 'status-badge ' + state;
+      el.innerHTML = `<span class="dot"></span> ${text}`;
+    }
+
+    // --- sources ---
+    async function loadSources(){
+      try{
+        const r = await fetch('/api/sources');
+        const j = await r.json();
+        sources = j.sources || [];
+        selectedSources = new Set(sources.map(s=>s.id));
+        renderSources();
+        $('#statSources').textContent = sources.length;
+        $('#kpiSources').textContent = sources.length;
+      }catch(e){
+        $('#sourcesGrid').innerHTML = '<div class="text-danger p-3" style="grid-column:1/-1">Failed to load sources</div>';
+      }
+    }
+    function renderSources(){
+      const grid = $('#sourcesGrid');
+      grid.innerHTML = '';
+      sources.forEach(s=>{
+        const checked = selectedSources.has(s.id);
+        const div = document.createElement('label');
+        div.className = 'source-check' + (checked ? ' checked' : '');
+        div.innerHTML = `
+          <input type="checkbox" ${checked?'checked':''} data-id="${s.id}">
+          <div style="min-width:0; flex:1">
+            <div class="source-name">${s.label}</div>
+            <div class="source-meta">${s.protocol.toUpperCase()} • ${new URL(s.url).hostname}</div>
+          </div>
+          <span class="badge-proto ${s.protocol}" style="font-size:.6rem">${s.protocol}</span>
+        `;
+        div.querySelector('input').addEventListener('change', (e)=>{
+          if(e.target.checked) selectedSources.add(s.id); else selectedSources.delete(s.id);
+          div.classList.toggle('checked', e.target.checked);
+        });
+        grid.appendChild(div);
+      });
+    }
+    $('#btnSelectAll').onclick = ()=>{ selectedSources = new Set(sources.map(s=>s.id)); renderSources(); };
+    $('#btnDeselectAll').onclick = ()=>{ selectedSources.clear(); renderSources(); };
+
+    // protocol pills
+    $$('.proto-pill').forEach(p=>{
+      p.addEventListener('click', ()=>{
+        const proto = p.dataset.proto;
+        if(selectedProtos.has(proto)){ selectedProtos.delete(proto); p.classList.remove('active'); }
+        else { selectedProtos.add(proto); p.classList.add('active'); }
+      });
+    });
+
+    // --- scrape ---
+    $('#btnScrape').onclick = async ()=>{
+      if(selectedSources.size===0) return toast('Select at least one source','error');
+      if(selectedProtos.size===0) return toast('Select at least one protocol','error');
+      const limit = parseInt($('#scrapeLimit').value,10)||0;
+      $('#btnScrape').disabled = true;
+      $('#btnScrape').innerHTML = '<span class="spinner-border spinner-border-sm"></span> Scraping…';
+      setBadge($('#scrapeBadge'),'running','Scraping…');
+      $('#scrapeProgress').style.width='0%';
+      $('#scrapeProgressText').textContent='0 / '+selectedSources.size;
+      $('#scrapeFound').textContent = 'Fetching sources in parallel…';
+      log('scrape', `Starting scrape of ${selectedSources.size} sources (${[...selectedProtos].join(', ')}) limit=${limit||'∞'}`);
+      startTime = Date.now();
+      if(timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(()=>{ $('#globalTimer').textContent = fmtTime(Math.floor((Date.now()-startTime)/1000)); }, 500);
+      try{
+        const r = await fetch('/api/scrape', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({sources:[...selectedSources], protocols:[...selectedProtos], limit})
+        });
+        const j = await r.json();
+        if(!j.ok) throw new Error(j.error||'Scrape failed');
+        scrapeJobId = j.job_id;
+        $('#btnStopScrape').classList.remove('d-none');
+        connectScrapeStream(scrapeJobId);
+      }catch(e){
+        toast(e.message,'error');
+        log('error', e.message);
+        setBadge($('#scrapeBadge'),'error','Error');
+        $('#btnScrape').disabled=false;
+        $('#btnScrape').innerHTML='<i class="bi bi-rocket-takeoff"></i> Scrape proxies';
+      }
+    };
+    $('#btnStopScrape').onclick = async ()=>{
+      if(!scrapeJobId) return;
+      await fetch('/stop/'+scrapeJobId, {method:'POST'});
+      log('info','Stop requested for scrape '+scrapeJobId);
+    };
+    function connectScrapeStream(jobId){
+      if(scrapeES) scrapeES.close();
+      scrapeES = new EventSource('/stream/'+jobId);
+      scrapeES.addEventListener('connected', e=>{
+        const d=JSON.parse(e.data); log('info', `Connected to scrape ${d.job_id}`);
+      });
+      scrapeES.addEventListener('source_result', e=>{
+        const d=JSON.parse(e.data);
+        log('scrape', `${d.label}: +${d.new} new (total ${d.total_found})`);
+        $('#scrapeFound').textContent = `${d.total_found} unique proxies found`;
+        const pct = Math.round((d.current/d.total)*100);
+        $('#scrapeProgress').style.width = pct+'%';
+        $('#scrapeProgressText').textContent = `${d.current} / ${d.total}`;
+        $('#globalProgress').style.width = pct+'%';
+        $('#progressText').textContent = `Scraping ${d.label}…`;
+        $('#progressCount').textContent = `${d.current} / ${d.total}`;
+      });
+      scrapeES.addEventListener('source_error', e=>{
+        const d=JSON.parse(e.data);
+        log('error', `${d.label}: ${d.error}`);
+      });
+      scrapeES.addEventListener('progress', e=>{
+        const d=JSON.parse(e.data);
+        const pct = Math.round((d.current/d.total)*100);
+        $('#scrapeProgress').style.width = pct+'%';
+        $('#scrapeProgressText').textContent = `${d.current} / ${d.total}`;
+      });
+      scrapeES.addEventListener('scrape_done', e=>{
+        const d=JSON.parse(e.data);
+        log('done', `Scrape finished: ${d.total} proxies, +${d.added} added to pool (store ${d.store_total})`);
+        $('#scrapeFound').textContent = `${d.total} proxies • ${d.store_total} in pool`;
+        refreshProxies();
+        updateStats();
+      });
+      scrapeES.addEventListener('done', e=>{
+        const d=JSON.parse(e.data);
+        log(d.stopped ? 'info' : 'done', d.stopped ? 'Scrape stopped' : `Scrape complete — ${d.total} proxies`);
+        setBadge($('#scrapeBadge'), d.stopped?'error':'done', d.stopped?'Stopped':'Scrape done');
+        $('#btnScrape').disabled=false;
+        $('#btnScrape').innerHTML='<i class="bi bi-rocket-takeoff"></i> Scrape proxies';
+        $('#btnStopScrape').classList.add('d-none');
+        scrapeES.close();
+        clearInterval(timerInterval);
+        refreshProxies();
+      });
+      scrapeES.addEventListener('error', e=>{
+        // SSE error is also fired on close; ignore if done
+      });
+      scrapeES.onerror = ()=>{
+        // will auto-reconnect; if job finished, server closes
+      };
+    }
+
+    // --- validate ---
+    $('#btnUseScraped').onclick = async ()=>{
+      await refreshProxies();
+      const toUse = proxies.filter(p=>p.status==='unvalidated' || filterStatus==='all').slice(0,500).map(p=>p.proxy);
+      if(toUse.length===0) return toast('No scraped proxies — scrape first','error');
+      $('#validateInput').value = toUse.join('\n');
+      toast(`Loaded ${toUse.length} proxies into validator`,'success');
+      log('info', `Loaded ${toUse.length} scraped proxies for validation`);
+    };
+    $('#btnClearValidate').onclick = ()=>{ $('#validateInput').value=''; };
+    $('#btnValidate').onclick = async ()=>{
+      const raw = $('#validateInput').value.trim();
+      if(!raw){
+        // try pool
+        await refreshProxies();
+        if(proxies.length===0) return toast('Paste proxies or scrape first','error');
+        $('#validateInput').value = proxies.slice(0,500).map(p=>p.proxy).join('\n');
+        if(!$('#validateInput').value.trim()) return toast('No proxies to validate','error');
+      }
+      const proxiesText = $('#validateInput').value.trim();
+      const timeout = parseInt($('#validateTimeout').value,10);
+      const protocol = $('#validateProto').value;
+      const testUrl = $('#validateUrl').value.trim() || 'http://httpbin.org/ip';
+      const lines = proxiesText.split('\n').filter(l=>l.trim() && !l.trim().startsWith('#'));
+      if(lines.length===0) return toast('No valid proxy lines','error');
+      if(lines.length>5000) return toast('Too many (max 5000)','error');
+      $('#btnValidate').disabled=true;
+      $('#btnValidate').innerHTML='<span class="spinner-border spinner-border-sm"></span> Validating…';
+      setBadge($('#validateBadge'),'running',`Validating ${lines.length}…`);
+      $('#validateProgress').style.width='0%';
+      $('#validateProgressText').textContent='0 / '+lines.length;
+      $('#cntValid').textContent='0'; $('#cntDead').textContent='0'; $('#cntTimeout').textContent='0';
+      log('info', `Validating ${lines.length} proxies via ${testUrl} timeout=${timeout}s proto=${protocol}`);
+      startTime = Date.now();
+      if(timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(()=>{ $('#globalTimer').textContent = fmtTime(Math.floor((Date.now()-startTime)/1000)); }, 500);
+      try{
+        const r = await fetch('/api/validate', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({proxies: proxiesText, timeout, test_url: testUrl, protocol, limit: lines.length})
+        });
+        const j = await r.json();
+        if(!j.ok) throw new Error(j.error||'Validate failed');
+        validateJobId = j.job_id;
+        $('#btnStopValidate').classList.remove('d-none');
+        connectValidateStream(validateJobId);
+      }catch(e){
+        toast(e.message,'error');
+        log('error', e.message);
+        setBadge($('#validateBadge'),'error','Error');
+        $('#btnValidate').disabled=false;
+        $('#btnValidate').innerHTML='<i class="bi bi-shield-check"></i> Validate proxies';
+      }
+    };
+    $('#btnStopValidate').onclick = async ()=>{
+      if(!validateJobId) return;
+      await fetch('/stop/'+validateJobId, {method:'POST'});
+      log('info','Stop requested for validation '+validateJobId);
+    };
+    function connectValidateStream(jobId){
+      if(validateES) validateES.close();
+      validateES = new EventSource('/stream/'+jobId);
+      validateES.addEventListener('connected', e=>{
+        const d=JSON.parse(e.data); log('info', `Validator connected ${d.job_id}`);
+      });
+      validateES.addEventListener('result', e=>{
+        const d=JSON.parse(e.data);
+        const r = d.result;
+        const tag = r.status==='valid' ? 'valid' : r.status;
+        const extra = r.latency ? ` ${r.latency}ms` : '';
+        const detail = r.error ? ` • ${r.error}` : (r.origin ? ` • ${r.origin.slice(0,40)}` : '');
+        log(tag, `${r.proxy} → ${r.status}${extra}${detail}`);
+        if(d.counts){
+          $('#cntValid').textContent = d.counts.valid||0;
+          $('#cntDead').textContent = d.counts.dead||0;
+          $('#cntTimeout').textContent = d.counts.timeout||0;
+          const total = (d.counts.valid||0)+(d.counts.dead||0)+(d.counts.timeout||0)+(d.counts.invalid||0)+(d.counts.error||0);
+          if(total>0){
+            const lat = proxies.filter(p=>p.status==='valid'&&p.latency).map(p=>p.latency);
+            // approximate from counts? update periodically via refresh
+          }
+        }
+      });
+      validateES.addEventListener('progress', e=>{
+        const d=JSON.parse(e.data);
+        const pct = Math.round((d.current/d.total)*100);
+        $('#validateProgress').style.width = pct+'%';
+        $('#validateProgressText').textContent = `${d.current} / ${d.total}`;
+        $('#globalProgress').style.width = pct+'%';
+        $('#progressText').textContent = `Validating ${d.current}/${d.total}`;
+        $('#progressCount').textContent = `${d.current} / ${d.total}`;
+        if(d.counts){
+          $('#cntValid').textContent = d.counts.valid||0;
+          $('#cntDead').textContent = d.counts.dead||0;
+          $('#cntTimeout').textContent = d.counts.timeout||0;
+        }
+        // refresh table every 20
+        if(d.current % 25 === 0) refreshProxies(true);
+      });
+      validateES.addEventListener('done', e=>{
+        const d=JSON.parse(e.data);
+        const c = d.counts||{};
+        log(d.stopped?'info':'done', d.stopped ? 'Validation stopped' : `Validation done — valid ${c.valid||0} / ${d.total} (${Math.round((c.valid||0)/d.total*100)||0}%)`);
+        setBadge($('#validateBadge'), d.stopped?'error':'done', d.stopped?'Stopped':`Done • ${c.valid||0} valid`);
+        $('#btnValidate').disabled=false;
+        $('#btnValidate').innerHTML='<i class="bi bi-shield-check"></i> Validate proxies';
+        $('#btnStopValidate').classList.add('d-none');
+        $('#cntSpeed').textContent = c.valid ? `${Math.round((c.valid/d.total)*100)}% hit` : '0%';
+        validateES.close();
+        clearInterval(timerInterval);
+        refreshProxies();
+        updateStats();
+      });
+    }
+
+    // --- proxies table ---
+    async function refreshProxies(silent){
+      try{
+        const r = await fetch('/api/proxies?limit=2000');
+        const j = await r.json();
+        proxies = j.proxies || [];
+        renderTable();
+        if(!silent) updateStats();
+      }catch(e){}
+    }
+    function updateStats(){
+      const total = proxies.length;
+      const valid = proxies.filter(p=>p.status==='valid').length;
+      const lats = proxies.filter(p=>p.status==='valid'&&p.latency).map(p=>p.latency);
+      const avg = lats.length ? Math.round(lats.reduce((a,b)=>a+b,0)/lats.length) : null;
+      $('#statTotal').textContent = total;
+      $('#statTotalSub').textContent = total ? 'in memory' : 'scrape to fill';
+      $('#statValid').textContent = valid;
+      $('#statValidSub').textContent = total ? `${Math.round(valid/Math.max(1,total)*100)}% success` : '0% success';
+      $('#statLatency').innerHTML = avg ? `${avg}<small> ms</small>` : '—<small> ms</small>';
+      $('#statLatencySub').textContent = avg ? (avg<800?'fast':'medium') : 'validate to measure';
+      $('#poolCount').textContent = total;
+      $('#tableInfo').textContent = `${getFiltered().length} shown • ${total} total`;
+    }
+    function getFiltered(){
+      let list = proxies;
+      if(filterStatus!=='all') list = list.filter(p=>p.status===filterStatus);
+      if(protoFilter) list = list.filter(p=>p.protocol===protoFilter);
+      if(searchQuery) list = list.filter(p=>p.proxy.toLowerCase().includes(searchQuery) || (p.ip&&p.ip.includes(searchQuery)));
+      return list;
+    }
+    function renderTable(){
+      const tbody = $('#proxyTbody');
+      const filtered = getFiltered();
+      // sort valid first by latency
+      filtered.sort((a,b)=>{
+        if(a.status==='valid'&&b.status==='valid') return (a.latency||99999)-(b.latency||99999);
+        if(a.status==='valid') return -1;
+        if(b.status==='valid') return 1;
+        return 0;
+      });
+      if(filtered.length===0){
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4" style="color: var(--text-dim)">No proxies match filter.<br><button class="btn btn-sm btn-ghost mt-2" onclick="clearFilters()">Clear filters</button></td></tr>`;
+        $('#tableInfo').textContent = `0 shown • ${proxies.length} total`;
+        return;
+      }
+      tbody.innerHTML = '';
+      // show up to 400 to keep DOM light
+      const show = filtered.slice(0,400);
+      show.forEach(p=>{
+        const tr = document.createElement('tr');
+        const latencyClass = p.latency==null ? '' : p.latency<800 ? 'fast' : p.latency<2000 ? 'medium' : 'slow';
+        const statusDot = p.status==='valid' ? 'valid' : p.status==='dead' ? 'dead' : p.status==='timeout' ? 'timeout' : 'unvalidated';
+        const latencyText = p.latency!=null ? `${p.latency}ms` : '—';
+        const checked = p.last_checked ? p.last_checked.split(' ')[1] || p.last_checked : '—';
+        tr.innerHTML = `
+          <td><input type="checkbox" class="row-check" data-proxy="${p.proxy}"></td>
+          <td style="font-family:'JetBrains Mono', monospace; font-weight:600; font-size:.82rem"><span class="proxy-text" style="cursor:pointer" title="Click to copy">${p.proxy}</span><br><span style="font-size:.68rem; color: var(--text-faint)">${p.source||''}</span></td>
+          <td><span class="badge-proto ${p.protocol||'http'}">${(p.protocol||'http').toUpperCase()}</span></td>
+          <td><span class="status-dot ${statusDot}"></span> <span style="font-size:.78rem; text-transform: capitalize">${p.status||'unvalidated'}</span></td>
+          <td class="latency ${latencyClass}">${latencyText}</td>
+          <td style="font-size:.75rem; color: var(--text-dim)">${checked}</td>
+          <td><button class="btn btn-sm btn-ghost py-0 px-2 proxy-copy" data-proxy="${p.proxy}" title="Copy"><i class="bi bi-clipboard"></i></button></td>
+        `;
+        // copy on click proxy text
+        tr.querySelector('.proxy-text').addEventListener('click', ()=>{ navigator.clipboard.writeText(p.proxy); toast('Copied '+p.proxy,'success'); });
+        tr.querySelector('.proxy-copy').addEventListener('click', ()=>{ navigator.clipboard.writeText(p.proxy); toast('Copied '+p.proxy,'success'); });
+        tbody.appendChild(tr);
+      });
+      if(filtered.length>400){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="7" class="text-center py-2" style="color: var(--text-dim); font-size:.78rem">Showing 400 / ${filtered.length} — use export to get all</td>`;
+        tbody.appendChild(tr);
+      }
+      $('#tableInfo').textContent = `${filtered.length} shown • ${proxies.length} total`;
+    }
+    window.clearFilters = ()=>{
+      filterStatus='all'; protoFilter=''; searchQuery='';
+      $$('.filter-chip').forEach(c=>c.classList.toggle('active', c.dataset.filter==='all'));
+      $('#protoFilter').value=''; $('#searchInput').value='';
+      renderTable();
+    };
+    // filter chips
+    $$('.filter-chip').forEach(chip=>{
+      chip.addEventListener('click', ()=>{
+        $$('.filter-chip').forEach(c=>c.classList.remove('active'));
+        chip.classList.add('active');
+        filterStatus = chip.dataset.filter;
+        renderTable();
+      });
+    });
+    $('#protoFilter').addEventListener('change', e=>{
+      protoFilter = e.target.value;
+      renderTable();
+    });
+    $('#searchInput').addEventListener('input', e=>{
+      searchQuery = e.target.value.trim().toLowerCase();
+      renderTable();
+    });
+    $('#btnRefresh').onclick = ()=> refreshProxies();
+    $('#btnClearPool').onclick = async ()=>{
+      if(!confirm('Clear all proxies from memory?')) return;
+      await fetch('/api/clear', {method:'POST'});
+      proxies=[]; renderTable(); updateStats(); toast('Pool cleared','success'); log('info','Pool cleared');
+    };
+    $('#btnClearLog').onclick = ()=>{ $('#logBody').innerHTML='<div class="log-empty">Logs cleared</div>'; logLines=0; $('#logCount').textContent='0 lines'; };
+    $('#checkAll').addEventListener('change', e=>{
+      $$('.row-check').forEach(c=>c.checked=e.target.checked);
+    });
+    $('#btnCopySelected').onclick = ()=>{
+      const sel = [...$$('.row-check:checked')].map(c=>c.dataset.proxy);
+      if(sel.length===0) return toast('No proxies selected','error');
+      navigator.clipboard.writeText(sel.join('\n'));
+      toast(`Copied ${sel.length} proxies`,'success');
+    };
+    $('#btnValidateSelected').onclick = ()=>{
+      const sel = [...$$('.row-check:checked')].map(c=>c.dataset.proxy);
+      if(sel.length===0) return toast('Select proxies first','error');
+      $('#validateInput').value = sel.join('\n');
+      toast(`Loaded ${sel.length} selected into validator`,'success');
+      document.querySelector('.card.panel:nth-child(2)').scrollIntoView({behavior:'smooth', block:'center'});
+    };
+    $('#btnCopyAll').onclick = ()=> copyValid();
+    window.copyValid = async ()=>{
+      const valid = proxies.filter(p=>p.status==='valid').map(p=>p.proxy);
+      if(valid.length===0) return toast('No valid proxies yet — validate first','error');
+      await navigator.clipboard.writeText(valid.join('\n'));
+      toast(`Copied ${valid.length} valid proxies`,'success');
+    };
+    $('#linkAllTxt').onclick = (e)=>{
+      e.preventDefault();
+      window.location.href='/export/txt?status=all';
+    };
+
+    // health
+    async function checkHealth(){
+      try{
+        const r = await fetch('/health');
+        const j = await r.json();
+        $('#healthStatus').innerHTML = `<span style="color: var(--ok)">● online</span> • ${j.proxies_total} proxies • ${j.proxies_valid} valid • ${j.sources} sources`;
+        $('#uptime').textContent = `uptime ${Math.floor(j.uptime_seconds/60)}m`;
+      }catch(e){ $('#healthStatus').textContent='offline'; }
+    }
+
+    // init
+    loadSources();
+    refreshProxies();
+    checkHealth();
+    setInterval(checkHealth, 15000);
+    // auto refresh pool periodically
+    setInterval(()=>{ if(!validateES && !scrapeES) refreshProxies(true); }, 8000);
+
+    // keyboard shortcuts
+    document.addEventListener('keydown', e=>{
+      if(e.key==='Enter' && (e.ctrlKey||e.metaKey)){
+        if(document.activeElement===document.body) $('#btnScrape').click();
+      }
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</body>
+</html>
