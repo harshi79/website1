@@ -1,0 +1,80 @@
+name: Build Windows EXE
+
+# Builds a REAL Windows x64 executable (PE) with PyInstaller on a genuine
+# Windows runner. Works on every Windows 10/11 PC (x64 and ARM64-via-emulation).
+on:
+  push:
+    branches: [main, "arena/**"]
+    tags: ["v*"]
+    paths-ignore:
+      - "executable/**"
+      - "**.md"
+      - "LICENSE"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build x64 EXE (Windows 10/11)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11 (x64)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          architecture: x64
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install "requests>=2.31,<3" "pysocks>=1.7" "urllib3>=2.0" "pyinstaller>=6.0"
+
+      - name: Build single-file EXE
+        run: >
+          pyinstaller --noconfirm --clean --onefile --windowed
+          --name UltimateProxyScrapper
+          --icon icon.ico
+          --add-data "icon.ico;."
+          --exclude-module flask --exclude-module gunicorn --exclude-module PIL
+          --exclude-module numpy --exclude-module pandas
+          main.py
+
+      - name: Verify EXE is a real Windows program (MZ/PE header) and runs
+        shell: pwsh
+        run: |
+          $exe = "dist\UltimateProxyScrapper.exe"
+          if (-not (Test-Path $exe)) { throw "EXE was not produced" }
+          $head = [System.IO.File]::ReadAllBytes($exe)[0..1]
+          if ([System.Text.Encoding]::ASCII.GetString($head) -ne "MZ") {
+            throw "Output is NOT a Windows executable (missing MZ header)"
+          }
+          & $exe --help | Out-Null
+          if ($LASTEXITCODE -ne 0) { throw "EXE failed smoke test (exit $LASTEXITCODE)" }
+          Write-Host ("OK: real Windows x64 EXE, {0:N1} MB" -f ((Get-Item $exe).Length / 1MB))
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: UltimateProxyScrapper-Windows-x64
+          path: dist/UltimateProxyScrapper.exe
+          if-no-files-found: error
+
+  release:
+    name: Attach EXE to GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download EXE
+        uses: actions/download-artifact@v4
+        with:
+          name: UltimateProxyScrapper-Windows-x64
+          path: dist
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/UltimateProxyScrapper.exe
