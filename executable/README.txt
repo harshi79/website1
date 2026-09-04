@@ -1,32 +1,43 @@
-Ultimate Proxy Scrapper — Executable (Protected)
+Ultimate Proxy Scrapper — Executable
 ==================================================
 © 2026 harshi79 / YorichiiPrime — Watermark: HARSHI79-ULTIMATE-PROXY-2026
 Version: 2.1.0
 
-How to run:
-  Windows (with Python installed):
-    python UltimateProxyScrapper.exe --auto
-    python UltimateProxyScrapper.pyz --auto
-    # Or double-click UltimateProxyScrapper.pyz if .pyz is associated
-    # For true Windows EXE (no Python needed, no source visible):
-    #   Double-click build_exe.bat in project root → dist\UltimateProxyScrapper.exe (real PE, ~30 MB)
+>>> UltimateProxyScrapper.exe <<<
+This is a REAL 64-bit Windows program (PE executable) built with PyInstaller
+on a genuine Windows build server. It runs on EVERY Windows 10 and Windows 11
+PC — x64 natively, Windows-on-ARM via built-in x64 emulation. No Python or
+any other dependency is required.
 
-  Linux/macOS:
-    python3 UltimateProxyScrapper.pyz --auto
-    python3 UltimateProxyScrapper.pyz          # GUI (needs display)
-    python3 UltimateProxyScrapper.exe --auto   # same as .pyz
+  How to use:
+    Double-click UltimateProxyScrapper.exe        -> GUI (dark dashboard)
+    Open a terminal in this folder:
+      UltimateProxyScrapper.exe --auto            -> scrape + validate + save
+      UltimateProxyScrapper.exe --auto --limit 1000 --timeout 8
+      UltimateProxyScrapper.exe --help            -> all CLI options
 
-CLI examples:
-  python UltimateProxyScrapper.pyz --auto --limit 1000 --timeout 8 --output results
-  python UltimateProxyScrapper.pyz --help
+  SmartScreen warning the first time? This exe is not code-signed (signing
+  certificates cost money). Click "More info" -> "Run anyway". That warning
+  is NOT the same as an incompatibility error — the exe will run fine.
 
-GUI:
-  python UltimateProxyScrapper.pyz             # launches polished Tkinter GUI with splash, tabs, log
+  Results are saved to: results\YYYY-MM-DD_HH-MM-SS\ next to the exe.
 
-Results:
-  results/YYYY-MM-DD_HH-MM-SS/
-    valid.txt, all.txt, valid.json/csv, stats.json (watermarked), _AUTHOR.txt
-  latest/ (copy of last run)
+
+>>> UltimateProxyScrapper.pyz <<<
+A Python "zipapp" for machines that HAVE Python installed (Linux, macOS,
+Windows). It is NOT a Windows program by itself — never rename it to .exe,
+Windows will reject it with "This app can't run on your PC".
+
+  python3 UltimateProxyScrapper.pyz              (GUI)
+  python3 UltimateProxyScrapper.pyz --auto       (CLI)
+
+
+>>> Build it yourself <<<
+  Windows : double-click build_exe.bat in the project root
+            -> dist\UltimateProxyScrapper.exe (real PE, ~15-30 MB)
+  CI      : every push builds a fresh exe automatically
+            (.github/workflows/build-windows-exe.yml) — download it from the
+            GitHub "Actions" tab (artifact) or the "Releases" page.
 
 Protection:
   Every file contains watermark HARSHI79-ULTIMATE-PROXY-2026 and author.

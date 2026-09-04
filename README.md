@@ -5,7 +5,11 @@
 ![Proxy](https://img.shields.io/badge/proxies-18%20sources-6366f1?style=for-the-badge)
 ![Threads](https://img.shields.io/badge/validator-80%20threads-10b981?style=for-the-badge)
 ![Protected](https://img.shields.io/badge/protected-HARSHI79--ULTIMATE--PROXY--2026-f43f5e?style=for-the-badge)
-![EXE](https://img.shields.io/badge/EXE-Windows%20%7C%20Linux%20%7C%20macOS-0ea5e9?style=for-the-badge)
+![EXE](https://img.shields.io/badge/EXE-Windows%20x64%20%7C%20Linux%20%7C%20macOS-0ea5e9?style=for-the-badge)
+
+**⬇️ Windows 10/11 users:** download `UltimateProxyScrapper.exe` from
+**[Releases](../../releases)** (or grab `executable/UltimateProxyScrapper.exe`
+from this repo) — double-click, no Python needed.
 
 **© 2026 harshi79 / YorichiiPrime — Watermark: `HARSHI79-ULTIMATE-PROXY-2026`**
 
@@ -23,11 +27,12 @@ proxy_engine.py      ← Shared core: 18 sources, scrape, validate (80 workers),
 app.py               ← Flask SSE web dashboard (optional)
 templates/index.html ← Premium single-page UI
 icon.png / icon.ico  ← App icon
-executable/          ← Pre-built single-file distributable (no Python needed after building true EXE)
-  UltimateProxyScrapper.pyz  (27 KB, run with: python UltimateProxyScrapper.pyz --auto)
-  UltimateProxyScrapper.exe  (same as .pyz, copy for Windows)
+executable/          ← Pre-built real Windows EXE + Python zipapp (see below)
+  UltimateProxyScrapper.exe  (REAL 64-bit Windows program — no Python needed, runs on every Windows 10/11 PC)
+  UltimateProxyScrapper.pyz  (27 KB, for machines WITH Python: python UltimateProxyScrapper.pyz --auto)
   README.txt
-build_exe.bat / build_exe.sh ← One-click true Windows EXE builder (PyInstaller, windowed, icon, ~30 MB)
+build_exe.bat / build_exe.sh ← One-click true Windows EXE builder (PyInstaller, windowed, icon, ~15-30 MB)
+.github/workflows/build-windows-exe.yml ← CI builds a fresh signed-off Windows x64 EXE on every push
 requirements.txt     ← Flask, requests, pysocks, Pillow, pyinstaller
 LICENSE              ← MIT with attribution requirement (must keep watermark)
 ```
@@ -66,29 +71,53 @@ results/
 - Integrity check `verify_integrity()` warns if watermark is removed.
 - LICENSE requires attribution — removing it violates license.
 
-### Run the distributable (no build needed)
+### Run the distributable
+
+**Windows 10 / 11 — no Python needed:**
+
+Double-click `executable/UltimateProxyScrapper.exe` — a real 64-bit Windows
+program (PyInstaller PE) that runs on any Windows 10/11 PC, x64 natively and
+Windows-on-ARM via emulation. Or from a terminal:
+
+```bat
+UltimateProxyScrapper.exe --auto --limit 500
+UltimateProxyScrapper.exe --help
+```
+
+> SmartScreen may show "Windows protected your PC" the first time because the
+> exe is not code-signed. Click **More info → Run anyway**. (That warning is
+> normal for unsigned freeware — it is *not* an incompatibility error.)
+
+**Any OS with Python 3.10+ installed:**
 
 ```bash
-# Portable single-file (needs Python 3.10+ installed)
 python executable/UltimateProxyScrapper.pyz              # GUI (polished, tabs, splash)
 python executable/UltimateProxyScrapper.pyz --auto       # CLI auto
 python executable/UltimateProxyScrapper.pyz --auto --limit 1000 --timeout 8 --output results
-
-# Windows (same file renamed to .exe)
-python executable/UltimateProxyScrapper.exe --auto --limit 500
 ```
 
+> ⚠ Never rename the `.pyz` to `.exe` — Windows will refuse to run it with
+> "This app can't run on your PC". Only the PyInstaller-built `.exe` above is
+> a real Windows program.
+
 ### Build a true Windows EXE (no Python needed, source hidden)
+
+**Easiest — let GitHub build it (nothing to install):**
+Every push automatically builds a fresh Windows x64 exe via
+[`.github/workflows/build-windows-exe.yml`](.github/workflows/build-windows-exe.yml).
+Grab it from the repo **Actions** tab (artifact `UltimateProxyScrapper-Windows-x64`)
+or the **Releases** page. Push a tag like `v2.1.0` and the exe is attached to a
+release automatically.
 
 On **Windows** with Python 3.10+:
 
 ```bat
-# One double-click:
+# One double-click (creates its own build environment, then builds):
 build_exe.bat
 # OR manual:
 pip install -r requirements.txt
-pyinstaller --onefile --windowed --name UltimateProxyScrapper --icon=icon.ico main.py
-# → dist\UltimateProxyScrapper.exe (real PE, ~30 MB, icon, no console, no source)
+pyinstaller --onefile --windowed --name UltimateProxyScrapper --icon=icon.ico --add-data "icon.ico;." main.py
+# → dist\UltimateProxyScrapper.exe (real PE, ~15-30 MB, icon, no console, no source)
 # Run: dist\UltimateProxyScrapper.exe  or  dist\UltimateProxyScrapper.exe --auto
 ```
 
