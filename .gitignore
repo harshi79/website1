@@ -17,10 +17,19 @@ Thumbs.db
 .idea/
 .vscode/
 
-# Data
+# Data / results
 proxies.txt
 valid.txt
 *.csv
+results/
+latest/
+dist/
+build/
+*.spec.bak
 
 # gunicorn
 gunicorn.pid
+
+# PyInstaller
+*.manifest
+*.pyinstaller
