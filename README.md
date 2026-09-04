@@ -5,7 +5,11 @@
 ![Proxy](https://img.shields.io/badge/proxies-18%20sources-6366f1?style=for-the-badge)
 ![Threads](https://img.shields.io/badge/validator-80%20threads-10b981?style=for-the-badge)
 ![Protected](https://img.shields.io/badge/protected-HARSHI79--ULTIMATE--PROXY--2026-f43f5e?style=for-the-badge)
-![EXE](https://img.shields.io/badge/EXE-Windows%20%7C%20Linux%20%7C%20macOS-0ea5e9?style=for-the-badge)
+![EXE](https://img.shields.io/badge/EXE-Windows%20x64%20%7C%20Linux%20%7C%20macOS-0ea5e9?style=for-the-badge)
+
+**⬇️ Windows 10/11 users:** download `UltimateProxyScrapper.exe` from
+**[Releases](../../releases)** (or grab `executable/UltimateProxyScrapper.exe`
+from this repo) — double-click, no Python needed.
 
 **© 2026 harshi79 / YorichiiPrime — Watermark: `HARSHI79-ULTIMATE-PROXY-2026`**
 
@@ -23,11 +27,10 @@ proxy_engine.py      ← Shared core: 18 sources, scrape, validate (80 workers),
 app.py               ← Flask SSE web dashboard (optional)
 templates/index.html ← Premium single-page UI
 icon.png / icon.ico  ← App icon
-executable/          ← Pre-built single-file distributable (no Python needed after building true EXE)
-  UltimateProxyScrapper.pyz  (27 KB, run with: python UltimateProxyScrapper.pyz --auto)
-  UltimateProxyScrapper.exe  (same as .pyz, copy for Windows)
+executable/          ← Pre-built REAL 64-bit Windows EXE (see below)
+  UltimateProxyScrapper.exe  (no Python needed, runs on every Windows 10/11 PC)
   README.txt
-build_exe.bat / build_exe.sh ← One-click true Windows EXE builder (PyInstaller, windowed, icon, ~30 MB)
+build_exe.bat / build_exe.sh ← One-click Windows EXE builder (PyInstaller, windowed, icon, ~15-30 MB)
 requirements.txt     ← Flask, requests, pysocks, Pillow, pyinstaller
 LICENSE              ← MIT with attribution requirement (must keep watermark)
 ```
@@ -66,16 +69,29 @@ results/
 - Integrity check `verify_integrity()` warns if watermark is removed.
 - LICENSE requires attribution — removing it violates license.
 
-### Run the distributable (no build needed)
+### Run the distributable
+
+**Windows 10 / 11 — no Python needed:**
+
+Double-click `executable/UltimateProxyScrapper.exe` — a real 64-bit Windows
+program (PyInstaller PE) that runs on any Windows 10/11 PC, x64 natively and
+Windows-on-ARM via emulation. Or from a terminal:
+
+```bat
+UltimateProxyScrapper.exe --auto --limit 500
+UltimateProxyScrapper.exe --help
+```
+
+> SmartScreen may show "Windows protected your PC" the first time because the
+> exe is not code-signed. Click **More info → Run anyway**. (That warning is
+> normal for unsigned freeware — it is *not* an incompatibility error.)
+
+**Any OS with Python 3.10+ installed:**
 
 ```bash
-# Portable single-file (needs Python 3.10+ installed)
-python executable/UltimateProxyScrapper.pyz              # GUI (polished, tabs, splash)
-python executable/UltimateProxyScrapper.pyz --auto       # CLI auto
-python executable/UltimateProxyScrapper.pyz --auto --limit 1000 --timeout 8 --output results
-
-# Windows (same file renamed to .exe)
-python executable/UltimateProxyScrapper.exe --auto --limit 500
+python main.py            # GUI (polished, tabs, splash)
+python main.py --auto     # CLI auto
+python main.py --auto --limit 1000 --timeout 8 --output results
 ```
 
 ### Build a true Windows EXE (no Python needed, source hidden)
@@ -83,12 +99,12 @@ python executable/UltimateProxyScrapper.exe --auto --limit 500
 On **Windows** with Python 3.10+:
 
 ```bat
-# One double-click:
+# One double-click (creates its own build environment, then builds):
 build_exe.bat
 # OR manual:
 pip install -r requirements.txt
-pyinstaller --onefile --windowed --name UltimateProxyScrapper --icon=icon.ico main.py
-# → dist\UltimateProxyScrapper.exe (real PE, ~30 MB, icon, no console, no source)
+pyinstaller --onefile --windowed --name UltimateProxyScrapper --icon=icon.ico --add-data "icon.ico;." main.py
+# → dist\UltimateProxyScrapper.exe (real PE, ~15-30 MB, icon, no console, no source)
 # Run: dist\UltimateProxyScrapper.exe  or  dist\UltimateProxyScrapper.exe --auto
 ```
 
@@ -127,7 +143,7 @@ Deploy: `pip install -r requirements.txt && gunicorn app:app --workers 1 --threa
 ## 🔒 Why EXE protects you
 
 - **Code is not visible** in true EXE (PyInstaller bundles to bytecode, plus icon, windowed).
-- **Watermark is embedded** in binary title, log, and results — even if someone extracts `.pyz`, your name is still there.
+- **Watermark is embedded** in binary title, log, and results — even if someone extracts the exe, your name is still there.
 - **LICENSE** legally requires attribution.
 - If someone claims they made it, ask them to show `_AUTHOR.txt` — it will still say `harshi79`.
 

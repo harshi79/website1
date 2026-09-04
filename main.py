@@ -46,6 +46,16 @@ def verify_integrity() -> bool:
     except:
         return True  # if file not found (frozen), assume ok
 
+def resource_path(rel: str) -> Path:
+    """Absolute path to a bundled resource (works in dev AND frozen PyInstaller exe).
+
+    In a --onefile exe, PyInstaller unpacks bundled data to sys._MEIPASS.
+    """
+    base = getattr(sys, "_MEIPASS", None)
+    if base:
+        return Path(base) / rel
+    return Path(__file__).parent / rel
+
 # Import engine
 try:
     from proxy_engine import SOURCES, scrape_proxies, validate_proxies, save_results
@@ -160,7 +170,7 @@ def launch_gui():
     root.geometry("1260x820")
     root.minsize(1180, 740)
     try:
-        icon = Path(__file__).parent / "icon.ico"
+        icon = resource_path("icon.ico")
         if icon.exists():
             root.iconbitmap(str(icon))
     except: pass
@@ -290,7 +300,7 @@ def launch_gui():
         win.configure(bg=PANEL)
         win.transient(root); win.grab_set()
         try:
-            win.iconbitmap(str(Path(__file__).parent / "icon.ico"))
+            win.iconbitmap(str(resource_path("icon.ico")))
         except: pass
         tk.Label(win, text="⬢ Ultimate Proxy Scrapper", bg=PANEL, fg=TEXT, font=("Segoe UI", 16, "bold")).pack(pady=(18,4))
         tk.Label(win, text=f"Version {VERSION} — Advanced Desktop", bg=PANEL, fg=DIM, font=("Segoe UI", 9)).pack()

@@ -1,58 +1,85 @@
 @echo off
-REM Build Ultimate Proxy Scrapper EXE for Windows
-REM Requires: Python 3.10+ and pip
+REM ============================================================
+REM  Ultimate Proxy Scrapper - Build a REAL Windows EXE
+REM  Produces a genuine 64-bit Windows program (PE) that runs on
+REM  every Windows 10 / Windows 11 PC (x64 + ARM64 via emulation).
+REM  Requires: Python 3.10+ installed from python.org (tick "Add to PATH")
+REM ============================================================
+setlocal
 echo ============================================================
-echo  Ultimate Proxy Scrapper — Build EXE
+echo  Ultimate Proxy Scrapper - Build EXE
 echo ============================================================
 
-python --version
-if errorlevel 1 (
-  echo Python not found. Install Python 3.10+ and add to PATH.
+REM -- Find Python (python or py launcher) --------------------
+set "PY="
+python --version >nul 2>&1 && set "PY=python"
+if not defined PY (
+  py -3 --version >nul 2>&1 && set "PY=py -3"
+)
+if not defined PY (
+  echo Python not found.
+  echo Install Python 3.10+ from https://www.python.org/downloads/
+  echo IMPORTANT: tick "Add python.exe to PATH" during install.
   pause
   exit /b 1
 )
+%PY% --version
 
-echo [1/3] Installing dependencies...
-pip install --upgrade pip
-pip install -r requirements.txt
-pip install pyinstaller
+echo.
+echo [1/4] Creating private build environment (.venv-build)...
+if not exist .venv-build (
+  %PY% -m venv .venv-build || (echo venv creation failed & pause & exit /b 1)
+)
+call .venv-build\Scripts\activate.bat
 
-echo [2/3] Cleaning previous build...
+echo.
+echo [2/4] Installing dependencies...
+python -m pip install --upgrade pip >nul
+pip install "requests>=2.31,<3" "pysocks>=1.7" "urllib3>=2.0" "pyinstaller>=6.0" || (echo pip install failed & pause & exit /b 1)
+
+echo.
+echo [3/4] Cleaning previous build...
 if exist build rmdir /s /q build
 if exist dist rmdir /s /q dist
-if exist __pycache__ rmdir /s /q __pycache__
+if exist UltimateProxyScrapper.spec del /q UltimateProxyScrapper.spec
 
-echo [3/3] Building EXE with PyInstaller...
-REM --onefile : single EXE
-REM --windowed : no console (GUI mode). Remove --windowed if you want console.
-REM --name : output name
-REM --icon : optional icon (if you have icon.ico, else remove line)
+echo.
+echo [4/4] Building EXE with PyInstaller...
+REM --onefile  : single .exe file
+REM --windowed : no console window (GUI app)
+REM --add-data : bundle the icon INSIDE the exe so it always loads
+set "EXTRA="
+if exist icon.ico set "EXTRA=--icon icon.ico --add-data "icon.ico;.""
 
-if exist icon.ico (
-  pyinstaller --onefile --windowed --name UltimateProxyScrapper --icon=icon.ico --add-data "templates;templates" main.py
-) else (
-  pyinstaller --onefile --windowed --name UltimateProxyScrapper main.py
-)
+pyinstaller --noconfirm --clean --onefile --windowed --name UltimateProxyScrapper %EXTRA% ^
+  --exclude-module flask --exclude-module gunicorn --exclude-module PIL ^
+  --exclude-module numpy --exclude-module pandas ^
+  main.py
 
 if errorlevel 1 (
-  echo Build failed — trying console mode...
-  pyinstaller --onefile --name UltimateProxyScrapper main.py
+  echo.
+  echo Build failed - retrying in console mode...
+  pyinstaller --noconfirm --clean --onefile --name UltimateProxyScrapper %EXTRA% main.py
+  if errorlevel 1 (echo Build failed again - see errors above & pause & exit /b 1)
 )
+
+echo.
+echo Verifying the EXE is a real Windows program...
+powershell -NoProfile -Command "$h=[IO.File]::ReadAllBytes('dist\UltimateProxyScrapper.exe')[0..1]; if([Text.Encoding]::ASCII.GetString($h)-ne'MZ'){throw 'NOT a real Windows exe'} ; 'OK: genuine Windows x64 EXE'"
 
 echo.
 echo ============================================================
 echo  Build finished!
-echo  EXE location: dist\UltimateProxyScrapper.exe
+echo  EXE location: %cd%\dist\UltimateProxyScrapper.exe
 echo.
-echo  Run it:
-echo    dist\UltimateProxyScrapper.exe            (launches GUI)
-echo    dist\UltimateProxyScrapper.exe --auto     (CLI auto scrape->validate->save)
-echo    dist\UltimateProxyScrapper.exe --help     (see options)
+echo  Run it (no Python needed on the target PC):
+echo    double-click dist\UltimateProxyScrapper.exe   (GUI)
+echo    dist\UltimateProxyScrapper.exe --auto         (CLI auto)
+echo    dist\UltimateProxyScrapper.exe --help
+echo.
+echo  Note: SmartScreen may warn the first time (unsigned exe).
+echo        Click "More info" then "Run anyway".
 echo.
 echo  Results are saved to: results\YYYY-MM-DD_HH-MM-SS\
-echo    - valid.txt / valid.json / valid.csv
-echo    - all.txt / all.json
-echo    - stats.json
-echo    - latest\  (always the last run)
 echo ============================================================
 pause
