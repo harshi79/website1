@@ -27,12 +27,10 @@ proxy_engine.py      ← Shared core: 18 sources, scrape, validate (80 workers),
 app.py               ← Flask SSE web dashboard (optional)
 templates/index.html ← Premium single-page UI
 icon.png / icon.ico  ← App icon
-executable/          ← Pre-built real Windows EXE + Python zipapp (see below)
-  UltimateProxyScrapper.exe  (REAL 64-bit Windows program — no Python needed, runs on every Windows 10/11 PC)
-  UltimateProxyScrapper.pyz  (27 KB, for machines WITH Python: python UltimateProxyScrapper.pyz --auto)
+executable/          ← Pre-built REAL 64-bit Windows EXE (see below)
+  UltimateProxyScrapper.exe  (no Python needed, runs on every Windows 10/11 PC)
   README.txt
-build_exe.bat / build_exe.sh ← One-click true Windows EXE builder (PyInstaller, windowed, icon, ~15-30 MB)
-.github/workflows/build-windows-exe.yml ← CI builds a fresh signed-off Windows x64 EXE on every push
+build_exe.bat / build_exe.sh ← One-click Windows EXE builder (PyInstaller, windowed, icon, ~15-30 MB)
 requirements.txt     ← Flask, requests, pysocks, Pillow, pyinstaller
 LICENSE              ← MIT with attribution requirement (must keep watermark)
 ```
@@ -91,23 +89,12 @@ UltimateProxyScrapper.exe --help
 **Any OS with Python 3.10+ installed:**
 
 ```bash
-python executable/UltimateProxyScrapper.pyz              # GUI (polished, tabs, splash)
-python executable/UltimateProxyScrapper.pyz --auto       # CLI auto
-python executable/UltimateProxyScrapper.pyz --auto --limit 1000 --timeout 8 --output results
+python main.py            # GUI (polished, tabs, splash)
+python main.py --auto     # CLI auto
+python main.py --auto --limit 1000 --timeout 8 --output results
 ```
 
-> ⚠ Never rename the `.pyz` to `.exe` — Windows will refuse to run it with
-> "This app can't run on your PC". Only the PyInstaller-built `.exe` above is
-> a real Windows program.
-
 ### Build a true Windows EXE (no Python needed, source hidden)
-
-**Easiest — let GitHub build it (nothing to install):**
-Every push automatically builds a fresh Windows x64 exe via
-[`.github/workflows/build-windows-exe.yml`](.github/workflows/build-windows-exe.yml).
-Grab it from the repo **Actions** tab (artifact `UltimateProxyScrapper-Windows-x64`)
-or the **Releases** page. Push a tag like `v2.1.0` and the exe is attached to a
-release automatically.
 
 On **Windows** with Python 3.10+:
 
@@ -156,7 +143,7 @@ Deploy: `pip install -r requirements.txt && gunicorn app:app --workers 1 --threa
 ## 🔒 Why EXE protects you
 
 - **Code is not visible** in true EXE (PyInstaller bundles to bytecode, plus icon, windowed).
-- **Watermark is embedded** in binary title, log, and results — even if someone extracts `.pyz`, your name is still there.
+- **Watermark is embedded** in binary title, log, and results — even if someone extracts the exe, your name is still there.
 - **LICENSE** legally requires attribution.
 - If someone claims they made it, ask them to show `_AUTHOR.txt` — it will still say `harshi79`.
 

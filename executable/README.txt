@@ -23,21 +23,14 @@ any other dependency is required.
   Results are saved to: results\YYYY-MM-DD_HH-MM-SS\ next to the exe.
 
 
->>> UltimateProxyScrapper.pyz <<<
-A Python "zipapp" for machines that HAVE Python installed (Linux, macOS,
-Windows). It is NOT a Windows program by itself — never rename it to .exe,
-Windows will reject it with "This app can't run on your PC".
-
-  python3 UltimateProxyScrapper.pyz              (GUI)
-  python3 UltimateProxyScrapper.pyz --auto       (CLI)
+>>> Other OSes (Linux / macOS) or with Python installed <<<
+  Run from source:  python main.py            (GUI)
+                    python main.py --auto     (CLI)
 
 
->>> Build it yourself <<<
+>>> Build the EXE yourself <<<
   Windows : double-click build_exe.bat in the project root
             -> dist\UltimateProxyScrapper.exe (real PE, ~15-30 MB)
-  CI      : every push builds a fresh exe automatically
-            (.github/workflows/build-windows-exe.yml) — download it from the
-            GitHub "Actions" tab (artifact) or the "Releases" page.
 
 Protection:
   Every file contains watermark HARSHI79-ULTIMATE-PROXY-2026 and author.
