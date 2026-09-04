@@ -1,0 +1,5 @@
+Flask>=3.0,<4
+requests>=2.31,<3
+gunicorn>=21.2
+pysocks>=1.7
+urllib3>=2.0
