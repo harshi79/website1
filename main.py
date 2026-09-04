@@ -4,9 +4,10 @@
 # All rights reserved. Licensed for personal use. Redistribution without
 # attribution is prohibited. Watermark: HARSHI79-ULTIMATE-PROXY-2026
 # Repository: https://github.com/harshi79/Ultimate-Free-Proxy-Scrapper-And-Validator
-# Version: 2.1.0  — Advanced Desktop EXE with auto-harvest & protected results
+# Version: 2.1.0  — desktop GUI (optional). CLI/one-shot: python proxy.py
 # =============================================================================
-# Build to EXE:  pyinstaller --onefile --windowed --name UltimateProxyScrapper --icon=icon.ico main.py
+# The prebuilt EXE was removed in v2.2 — run `python proxy.py` (no build, no exe).
+# If you still want one:  pyinstaller --onefile --name proxy proxy.py
 # Run GUI:       python main.py
 # Run CLI:       python main.py --auto --limit 1000 --output results
 # =============================================================================
